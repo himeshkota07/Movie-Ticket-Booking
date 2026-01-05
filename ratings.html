@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratings - Movie Ticket Booking</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .ratings-container {
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .rating-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stars {
+            color: #f1c40f; /* gold */
+            font-size: 1.25rem;
+            margin-left: 10px;
+        }
+        .rating-card h3 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        .rating-card p {
+            margin: 0;
+            color: #666;
+        }
+        /* Charts */
+        .charts { display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
+        .chart-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1; min-width: 280px; text-align: center; }
+        .chart-card h3 { margin: 0 0 10px; color: #2c3e50; }
+        .chart-card canvas { max-width: 100%; height: auto; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Movie Ticket Booking</h1>
+    <nav>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="movies.html">Movies</a></li>
+            <li><a href="ratings.html">Ratings</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="ratings-container">
+    <h2>Top Rated Movies</h2>
+    <p>Here are some of the highest-rated movies from our visitors.</p>
+
+    <div class="charts">
+        <div class="chart-card">
+            <h3>Rating Comparison</h3>
+            <canvas id="ratingsBarChart" width="600" height="300"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>Ratings Distribution</h3>
+            <canvas id="ratingsDoughnutChart" width="400" height="300"></canvas>
+        </div>
+    </div>
+
+    <div class="rating-card">
+        <div>
+            <h3>PUSHPA THE RULE <span class="stars">★★★★☆</span></h3>
+            <p>Average Rating: 4.2 / 5</p>
+        </div>
+        <div>
+            <p>Reviews: 1,254</p>
+        </div>
+    </div>
+
+    <div class="rating-card">
+        <div>
+            <h3>DEVARA <span class="stars">★★★★☆</span></h3>
+            <p>Average Rating: 4.0 / 5</p>
+        </div>
+        <div>
+            <p>Reviews: 987</p>
+        </div>
+    </div>
+
+    <div class="rating-card">
+        <div>
+            <h3>BHOOL BHULAAIYA 3 <span class="stars">★★★☆☆</span></h3>
+            <p>Average Rating: 3.6 / 5</p>
+        </div>
+        <div>
+            <p>Reviews: 642</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="movies.html"><button>Browse Movies</button></a>
+        <a href="contact.html" style="margin-left:10px;"><button>Give Feedback</button></a>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 Online Movie Ticket Booking System</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Static movie rating data (keep in sync with visible rating cards)
+const movies = [
+  { title: 'PUSHPA THE RULE', rating: 4.2 },
+  { title: 'DEVARA', rating: 4.0 },
+  { title: 'BHOOL BHULAAIYA 3', rating: 3.6 },
+  { title: 'MAD SQUARE', rating: 3.8 },
+  { title: 'LUCKY BHASKER', rating: 4.1 },
+  { title: 'KALKI 2898 AD', rating: 4.0 },
+  { title: 'UNTIL DAWN', rating: 3.9 },
+  { title: 'STREE 2', rating: 3.7 },
+  { title: 'RETRO', rating: 3.5 }
+];
+
+const labels = movies.map(m => m.title);
+const data = movies.map(m => m.rating);
+
+// Bar chart
+const barCtx = document.getElementById('ratingsBarChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      label: 'Average Rating',
+      data,
+      backgroundColor: 'rgba(231,76,60,0.85)',
+      borderColor: 'rgba(192,57,43,1)',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: { beginAtZero: true, suggestedMax: 5 }
+    },
+    plugins: { legend: { display: false } }
+  }
+});
+
+// Doughnut chart
+const doughCtx = document.getElementById('ratingsDoughnutChart').getContext('2d');
+new Chart(doughCtx, {
+  type: 'doughnut',
+  data: {
+    labels,
+    datasets: [{
+      data,
+      backgroundColor: ['#e74c3c','#c0392b','#f1c40f','#9b59b6','#3498db','#2ecc71','#e67e22','#1abc9c','#95a5a6']
+    }]
+  },
+  options: {
+    plugins: { legend: { position: 'right' } }
+  }
+});
+</script>
+</body>
+</html>
