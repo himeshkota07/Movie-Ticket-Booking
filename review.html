@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviews - Movie Ticket Booking</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .review-container{padding:40px 0}
+    .review-card{background:white; padding:20px; border-radius:8px}
+    .review-list div{border-bottom:1px solid #eee; padding:8px 0}
+    .movie-meta{display:flex; gap:20px; align-items:center}
+  </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <div class="logo"><a href="home.html">Movie Ticket Booking</a></div>
+        <nav>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="movies.html">Movies</a></li>
+                <li><a href="ratings.html">Ratings</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container review-container">
+  <div class="review-card">
+    <h2 id="movieTitle">Movie Title</h2>
+    <div class="movie-meta">
+      <div><strong>Average:</strong> <span id="movieRating"></span> (<span id="movieStars"></span>)</div>
+      <div><strong>Reviews:</strong> <span id="movieCount"></span></div>
+    </div>
+
+    <section style="margin-top:20px;">
+      <h3>Reviews</h3>
+      <div id="reviewList" class="review-list"></div>
+    </section>
+
+    <section style="margin-top:20px;">
+      <h3>Add Your Rating & Review</h3>
+      <form id="addReviewForm" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <label for="ratingInput">Rating (1-5):</label>
+        <input type="number" id="ratingInput" min="1" max="5" required>
+        <label for="commentInput">Comment:</label>
+        <input type="text" id="commentInput" maxlength="200" placeholder="Share your thoughts">
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+
+    <div style="margin-top:20px">
+      <a href="ratings.html"><button>Back to Ratings</button></a>
+      <a href="movies.html" style="margin-left:10px;"><button>Browse Movies</button></a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2025 Online Movie Ticket Booking System</p>
+</footer>
+
+<script>
+// same initialMovies list as in ratings.html to seed localStorage when missing
+const initialMovies = [
+  { title: 'PUSHPA THE RULE', rating: 4.2, count: 1254, comments: ['Loved the performances!', 'Great soundtrack.'] },
+  { title: 'DEVARA', rating: 4.0, count: 987, comments: ['A solid entertainer.'] },
+  { title: 'BHOOL BHULAAIYA 3', rating: 3.6, count: 642, comments: ['Good thrills.'] },
+  { title: 'MAD SQUARE', rating: 3.8, count: 420, comments: [] },
+  { title: 'LUCKY BHASKER', rating: 4.1, count: 301, comments: [] },
+  { title: 'KALKI 2898 AD', rating: 4.0, count: 256, comments: [] },
+  { title: 'UNTIL DAWN', rating: 3.9, count: 190, comments: [] },
+  { title: 'STREE 2', rating: 3.7, count: 210, comments: [] },
+  { title: 'RETRO', rating: 3.5, count: 150, comments: [] }
+];
+
+let movies = JSON.parse(localStorage.getItem('moviesRatings') || 'null') || initialMovies;
+
+function getQueryParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
+function starsFromRating(avg) {
+  const r = Math.round(avg);
+  let stars = '';
+  for (let i = 0; i < 5; i++) stars += (i < r) ? '★' : '☆';
+  return stars;
+}
+
+function renderMoviePage(idx) {
+  const titleEl = document.getElementById('movieTitle');
+  const ratingEl = document.getElementById('movieRating');
+  const starsEl = document.getElementById('movieStars');
+  const countEl = document.getElementById('movieCount');
+  const list = document.getElementById('reviewList');
+
+  if (idx < 0 || idx >= movies.length) {
+    titleEl.textContent = 'Movie not found';
+    ratingEl.textContent = '-';
+    countEl.textContent = '-';
+    list.innerHTML = '<p>Invalid movie selection.</p>';
+    return;
+  }
+
+  const movie = movies[idx];
+  titleEl.textContent = movie.title;
+  ratingEl.textContent = movie.rating.toFixed(2) + ' / 5';
+  starsEl.textContent = starsFromRating(movie.rating);
+  countEl.textContent = movie.count.toLocaleString();
+
+  list.innerHTML = '';
+  if (!movie.comments || movie.comments.length === 0) {
+    list.innerHTML = '<p>No reviews yet — be the first!</p>';
+    return;
+  }
+  movie.comments.slice(0, 50).forEach(c => {
+    const div = document.createElement('div');
+    div.textContent = c;
+    list.appendChild(div);
+  });
+}
+
+// handle submit
+document.addEventListener('DOMContentLoaded', () => {
+  const idParam = getQueryParam('id');
+  const idx = idParam ? Number(idParam) : 0;
+  renderMoviePage(idx);
+
+  const form = document.getElementById('addReviewForm');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const ratingValue = Number(document.getElementById('ratingInput').value);
+    const comment = document.getElementById('commentInput').value.trim();
+    if (!ratingValue || ratingValue < 1 || ratingValue > 5) return alert('Please enter a rating between 1 and 5.');
+
+    const movie = movies[idx];
+    const newCount = movie.count + 1;
+    const newAvg = ((movie.rating * movie.count) + ratingValue) / newCount;
+    movie.count = newCount;
+    movie.rating = Number(newAvg.toFixed(2));
+    if (!movie.comments) movie.comments = [];
+    if (comment) movie.comments.unshift(comment);
+
+    localStorage.setItem('moviesRatings', JSON.stringify(movies));
+
+    renderMoviePage(idx);
+
+    form.reset();
+    alert('Thanks — your rating has been submitted!');
+  });
+});
+</script>
+</body>
+</html>

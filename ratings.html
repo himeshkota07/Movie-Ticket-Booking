@@ -112,19 +112,13 @@ function renderCards() {
       </div>
       <div>
         <p>Reviews: ${m.count.toLocaleString()}</p>
-        <button data-idx="${idx}" class="view-reviews">View Reviews</button>
+        <a href="review.html?id=${idx}"><button>View Reviews</button></a>
       </div>
     `;
     container.appendChild(card);
   });
 
-  // attach review buttons
-  document.querySelectorAll('.view-reviews').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = Number(btn.getAttribute('data-idx'));
-      renderReviews(idx);
-    });
-  });
+  // review buttons now link to per-movie review pages via review.html?id=<index>
 }
 
 function renderCharts() {
